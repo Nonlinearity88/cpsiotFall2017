@@ -1,0 +1,64 @@
+<!doctype html>
+<meta charset = utf8>
+<html>
+    
+    <head>
+        <title>Example with input</title>
+    </head>
+    
+    <body>
+        
+        <div id="print1"></div>
+        <canvas id="canvas1" width="490" height="220"></canvas>
+
+
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            "use strict";
+            
+            
+            var canvas = document.getElementById('canvas1');
+            var context = canvas.getContext('2d');
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+            var radius = 70;
+
+      
+            
+            var divElement = document.getElementById("print1");
+            
+            
+            var socket = io.connect("172.16.22.128:8080");
+            
+            socket.on("messageToClient", function (msg){
+                if (msg == 0)
+                {
+                    context.beginPath();
+                    context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+                    context.fillStyle = 'red';
+                    context.fill();
+                    context.lineWidth = 5;
+                    context.strokeStyle = '#003300';
+                    context.stroke();
+                }
+                else
+                {
+                    context.beginPath();
+                    context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+                    context.fillStyle = 'green';
+                    context.fill();
+                    context.lineWidth = 5;
+                    context.strokeStyle = '#003300';
+                    context.stroke();
+                }
+            });
+            
+            socket.on("disconnect", function(){
+                log("Disconnected from the server"); // we print status of disconn. to div
+            });
+            
+        </script>
+        
+    </body>
+    
+</html>

@@ -14,7 +14,7 @@ var board = new firmata.Board("/dev/ttyACM0", function(){ // ACM Abstract Contro
 
 
 function handler(req, res) {
-    fs.readFile(__dirname + "/example7.html",
+    fs.readFile(__dirname + "/a5.html",
     function (error, data) {
         if (error) {
             res.writeHead(500, {"Content-Type": "text/plain"});
