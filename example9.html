@@ -1,0 +1,66 @@
+<!doctype html>
+<meta charset = utf8>
+<html>
+    
+    <head>
+        <title>Example with input</title>
+    </head>
+    
+    <body>
+        
+        <div id="print1"></div>
+        
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            "use strict";
+            
+            var numberOfLinesbeforeScroll = 10;
+            var linesPrintCounter = 0;
+            
+            var divElement = document.getElementById("print1");
+            
+            function log(msg) {
+                
+                var node = document.createElement("tr");
+                var textNode = document.createTextNode(linesPrintCounter);
+                node.appendChild(textNode);
+                divElement.insertBefore(node, divElement.childNodes[0]);
+                if (linesPrintCounter > numberOfLinesbeforeScroll - 1) {
+                    divElement.removeChild(divElement.childNodes[numberOfLinesbeforeScroll]);
+                }
+                
+                linesPrintCounter ++;
+                
+            }
+            
+            var socket = io.connect("172.16.22.128:8080");
+            
+            socket.on("messageToClient", function (msg){
+                log(msg); // add msg
+            });
+            
+            socket.on("disconnect", function(){
+                log("Disconnected from the server"); // we print status of disconn. to div
+            });
+            
+            // print of IP adresses, ports, ip family
+            clientIpAddress = socket.request.socket.remoteAddress;
+            io.sockets.emit("messageToClient", "socket.request.socket.remoteAddress: " + socket.request.socket.remoteAddress);
+            // ::ffff:192.168.254.1 is ipv6 address
+            // in Chrome we enter: http://[::ffff:192.168.254.131]:8080 -> http://[::ffff:c0a8:fe83]:8080
+            io.sockets.emit("messageToClient", "socket.request.connection._peername.family: " + socket.request.connection._peername.family);
+            io.sockets.emit("messageToClient", "socket.request.connection._peername.port: " + socket.request.connection._peername.port);
+            io.sockets.emit("messageToClient", "socket.id: " + socket.id);
+            // extract ipv4 address ->
+            var idx = clientIpAddress.lastIndexOf(':');
+            var address4;
+            if (~idx && ~clientIpAddress.indexOf('.')) {
+                address4 = clientIpAddress.slice(idx + 1);
+            }
+                io.sockets.emit("messageToClient", "ipv4 address: " + socket.request.socket.remoteAddress);
+                io.sockets.emit("messageToClient", "Client data ----------------------------->");           
+        </script>
+        
+    </body>
+    
+</html>

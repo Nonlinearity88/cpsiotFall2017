@@ -1,0 +1,96 @@
+<!doctype html>
+<meta charset = utf8>
+<html>
+    
+    <head>
+        <title>Example with input</title>
+    </head>
+    
+    <body onload = "load()";>
+        
+        <div>
+            <canvas id="canvas1" width ="400" height = "200" style="border: 1px dashed #00c3c3;"></canvas>    
+        </div>    
+        
+        <div id="print1"></div>
+        
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            "use strict";
+            
+            var numberOfLinesbeforeScroll = 10;
+            var linesPrintCounter = 0;
+            
+            var potValue1 = 0; // value of the first potentiometer
+            var x1 = new Array(); // array for x1
+            var y1 = new Array(); // array for y1
+            var canvas1;
+            var ctx1;    
+    
+            
+            var divElement = document.getElementById("print1");
+            
+            function log(msg) {
+                
+                var node = document.createElement("tr");
+                var textNode = document.createTextNode(linesPrintCounter + " !!!! " + msg);
+                node.appendChild(textNode);
+                divElement.insertBefore(node, divElement.childNodes[0]);
+                if (linesPrintCounter > numberOfLinesbeforeScroll - 1) {
+                    divElement.removeChild(divElement.childNodes[numberOfLinesbeforeScroll]);
+                }
+                
+                linesPrintCounter ++;
+                
+            }
+            
+            function load() { // function that is started, when we open the page
+                canvas1 = document.getElementById("canvas1");
+                ctx1 = canvas1.getContext("2d");
+
+                // initialization of graph with points
+                ctx1.lineWidth = "1";
+                ctx1.strokeStyle = "#ff0000";
+    
+                // draw first time series initialization
+                for (var i=0; i<200; i++) {
+                    x1[i] = i; // for x values are 0, 1, 2, ...
+                    y1[i] = 0; // for y values are 0
+                }
+            };
+            
+            var socket = io.connect("172.16.22.128:8080");
+            
+            socket.on("messageToClient", function (msg){
+                log(msg); // add msg
+            });
+            
+            socket.on("disconnect", function(){
+                log("Disconnected from the server"); // we print status of disconn. to div
+            });
+            
+            socket.on("clientReadValues", function(value) {
+                
+                potValue1 = value.desiredValue;
+                
+                ctx1.lineWidth = "12";
+                ctx1.strokeStyle = potValue1;
+                
+                ctx1.clearRect(0, 0, canvas1.width, canvas1.height); // clear the canvas
+                ctx1.beginPath(); // to start drawing new line
+                y1.splice(0, 1); // on the position 0 in the field y1 we erase one value
+                y1[199] = potValue1; // new value is added at the end
+                for (var i=0; i<200; i++) {
+                    ctx1.lineTo(x1[i], (200 - (y1[i] / 1023) * 200)); // 0,0 x,y coordinate is in upper left corner
+                };
+                ctx1.stroke();
+                log(value.desiredValue);
+                
+            });
+            
+                   
+        </script>
+        
+    </body>
+    
+</html>
