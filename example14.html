@@ -8,6 +8,9 @@
     
     <body onload = "load()";>
         
+        <button id="buttonStartControlAlgorithm" onClick="startControlAlgorithm()">Start Ctrl Alg</button>
+        <button id="buttonStopControlAlgorithm" onClick="stopControlAlgorithm()">Stop Ctrl Alg</button>
+        
         <div>
             <canvas id="canvas1" width ="400" height = "200" style="border: 1px dashed #00c3c3;"></canvas>    
         </div>    
@@ -30,6 +33,13 @@
             var x2 = new Array(); // array for x2 variable
             var y2 = new Array(); // array for y2 variable
     
+            function startControlAlgorithm () {
+                socket.emit("startControlAlgorithm");
+            }
+
+            function stopControlAlgorithm () {
+                socket.emit("stopControlAlgorithm");
+            }
             
             var divElement = document.getElementById("print1");
             
@@ -66,13 +76,9 @@
                     x2[i] = i; // for x values are 0, 1, 2, ...
                     y2[i] = 0; // for y values are 0
                  }
-                 
-                 
-                 
-                 
             };
             
-            var socket = io.connect("172.16.22.128:8080");
+            var socket = io.connect("172.16.22.70:8080");
             
             socket.on("messageToClient", function (msg){
                 log(msg); // add msg
@@ -81,16 +87,6 @@
             socket.on("disconnect", function(){
                 log("Disconnected from the server"); // we print status of disconn. to div
             });
-            
-            if (x2[i] < x1[i]) {
-                     socket.emit("commandToArduino", 1);
-                 }
-                 else if (x2[i] > x1[i]) {
-                     socket.emit("commandToArduino", -1);
-                 }
-                 else {
-                     socket.emit("commandToArduino", 0);
-                 }
             
             socket.on("clientReadValues", function(value) {
                 

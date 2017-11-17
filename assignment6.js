@@ -64,7 +64,6 @@ board.on("ready", function() {
         }
         if (commandNo == "-1") {
             board.digitalWrite(11, board.HIGH);
-        
             board.digitalWrite(13, board.LOW);
             board.digitalWrite(12, board.LOW);
         }
